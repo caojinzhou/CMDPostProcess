@@ -67,7 +67,7 @@ namespace CMDPostProcess
         {
 
             //分163个文件读
-            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201512_CMProcess\\HMMResult_Version3");
+            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201512_CMProcess\\HMMResult\\version3");
             int m = 0;
             foreach (FileInfo fi in dir.GetFiles())
             {
@@ -291,7 +291,7 @@ namespace CMDPostProcess
 
         public void WriteData()
         {
-            string directoryPath = @"D:\\201512_CMProcess\\HMMstatistical_Version3";//定义一个路径变量            
+            string directoryPath = @"D:\\201512_CMProcess\\HMMstatistical\\version3";//定义一个路径变量            
 
             if (!Directory.Exists(directoryPath))//如果路径不存在
             {
