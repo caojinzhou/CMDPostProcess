@@ -11,7 +11,7 @@ namespace CMDPostProcess
         static void Main(string[] args)
         {
             ResultCluster process = new ResultCluster();
-            process.StationIdInfoInput();
+            process.CellIdInfoInput();
             process.ReadData();
             //process.MPDataProcessing();
             //process.FindMax();

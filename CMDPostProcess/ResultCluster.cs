@@ -12,7 +12,7 @@ namespace CMDPostProcess
         public DateTime intimeindex;
         public DateTime outtimeindex;
         public int userid;
-        public int stationid;
+        public int cellid;
         public int NumST;
         public string ActiType;
 
@@ -27,7 +27,7 @@ namespace CMDPostProcess
             intimeindex = p0;
             outtimeindex = p1;
             userid = p2;
-            stationid = p3;
+            cellid = p3;
             NumST = p5;
             ActiType = p6;
         }
@@ -59,7 +59,7 @@ namespace CMDPostProcess
         int UserW = 0;
         int UserO = 0;
 
-        Dictionary<int, string[]> StationInfo = new Dictionary<int, string[]>();
+        Dictionary<int, string[]> CellInfo = new Dictionary<int, string[]>();
 
 
 
@@ -67,7 +67,7 @@ namespace CMDPostProcess
         {
 
             //分163个文件读
-            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201512_CMProcess\\HMMResult\\version3");
+            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201604_CMProcess\\HMMResult\\versionTest");
             int m = 0;
             foreach (FileInfo fi in dir.GetFiles())
             {
@@ -82,15 +82,15 @@ namespace CMDPostProcess
                         DateTime indt = DateTime.ParseExact(strArr[2], "yyyy/M/dd H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         DateTime outdt = DateTime.ParseExact(strArr[3], "yyyy/M/dd H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         int numst = Convert.ToInt32(strArr[4]);
-                        int stationid = Convert.ToInt32(strArr[5]);
+                        int cellid = Convert.ToInt32(strArr[5]);
 
                         if (ImportData.ContainsKey(userid))
                         {
-                            ImportData[userid].Add(new STData(indt,outdt, userid, stationid,numst,actitype));
+                            ImportData[userid].Add(new STData(indt,outdt, userid, cellid,numst,actitype));
                         }
                         else
                         {
-                            ImportData.Add(userid, new List<STData>() { new STData(indt, outdt, userid, stationid, numst, actitype) });
+                            ImportData.Add(userid, new List<STData>() { new STData(indt, outdt, userid, cellid, numst, actitype) });
                             TotalUser++;
                         }
                         Totalcount++;
@@ -110,7 +110,7 @@ namespace CMDPostProcess
         {
             foreach (var TT in ImportData)
             {
-                var q = from w in TT.Value select w.stationid;
+                var q = from w in TT.Value select w.cellid;
                 List<int> ActivityTypes = new List<int>();
                 if(UserStati.ContainsKey(TT.Key))
                 {
@@ -129,8 +129,8 @@ namespace CMDPostProcess
                     int type=(int)Enum.Parse(typeof(Activity), vv.ActiType, true);
                     ActivityTypes.Add(type);
 
-                    int tower = vv.stationid;
-                    int RegionId = Convert.ToInt32(StationInfo[tower][2]);
+                    int tower = vv.cellid;
+                    int RegionId = Convert.ToInt32(CellInfo[tower][2]);
                     int intimestamp = vv.intimeindex.Hour;
                     int outtimestamp = vv.outtimeindex.Hour;
                     //int timestamp = (vv.intimeindex.Hour + vv.outtimeindex.Hour) > 24 ? (int)(vv.intimeindex.Hour + vv.outtimeindex.Hour - 24) / 2 : (int)(vv.intimeindex.Hour + vv.outtimeindex.Hour) / 2;
@@ -291,7 +291,7 @@ namespace CMDPostProcess
 
         public void WriteData()
         {
-            string directoryPath = @"D:\\201512_CMProcess\\HMMstatistical\\version3";//定义一个路径变量            
+            string directoryPath = @"D:\\201604_CMProcess\\HMMstatistical\\versionTest";//定义一个路径变量            
 
             if (!Directory.Exists(directoryPath))//如果路径不存在
             {
@@ -311,7 +311,7 @@ namespace CMDPostProcess
             StreamWriter swTT = new StreamWriter(Path.Combine(directoryPath, "TowerTime.txt")); ;
             foreach(var TT in TowerTime)
             {
-                swTT.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", TT.Key, StationInfo[TT.Key][0], StationInfo[TT.Key][1], StationInfo[TT.Key][2], StationInfo[TT.Key][3]);
+                swTT.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", TT.Key, CellInfo[TT.Key][0], CellInfo[TT.Key][1], CellInfo[TT.Key][2], CellInfo[TT.Key][3]);
                 for (int j = 0; j < 24; j++)
                 {
                     swTT.Write("{0}\t", TT.Value[j]);
@@ -322,7 +322,7 @@ namespace CMDPostProcess
             StreamWriter swTtC = new StreamWriter(Path.Combine(directoryPath, "TowerCategory.txt")); ;
             foreach (var TT in TowerCategory)
             {
-                swTtC.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", TT.Key, StationInfo[TT.Key][0], StationInfo[TT.Key][1], StationInfo[TT.Key][2], StationInfo[TT.Key][3]);
+                swTtC.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", TT.Key, CellInfo[TT.Key][0], CellInfo[TT.Key][1], CellInfo[TT.Key][2], CellInfo[TT.Key][3]);
                 for (int j = 0; j < 9; j++)
                 {
                     swTtC.Write("{0}\t", TT.Value[j]);
@@ -387,14 +387,13 @@ namespace CMDPostProcess
         }
 
 
-        public void StationIdInfoInput()
+        public void CellIdInfoInput()
         {
-            //基站id数据
             //基站id数据
             try
             {
 
-                using (StreamReader sr = new StreamReader("D:\\201512_CMProcess\\stationIdInfo5934Region.txt"))
+                using (StreamReader sr = new StreamReader("D:\\201604_CMProcess\\GridCellInfo.txt"))
                 {
 
                     String line;
@@ -403,12 +402,12 @@ namespace CMDPostProcess
                     {
                         string[] strArr = line.Split('\t');
                         //字段：lat，lon，regionid，regionname
-                        String[] LatLon = new string[] { strArr[1], strArr[2], strArr[3], strArr[4] };
+                        String[] LatLon = new string[] { strArr[2], strArr[3], strArr[5], strArr[4] };
 
-                        StationInfo.Add(Convert.ToInt32(strArr[0]), LatLon);
+                        CellInfo.Add(Convert.ToInt32(strArr[0]), LatLon);
                         i++;
                     }
-                    Console.WriteLine(i + "  station id has been read");
+                    Console.WriteLine(i + "  cell id has been read");
 
                 }
 
