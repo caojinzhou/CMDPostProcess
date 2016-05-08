@@ -48,7 +48,7 @@ namespace CMDPostProcess
         private Dictionary<int, List<STData>> ImportData = new Dictionary<int, List<STData>>();
         //private int[] MaxCat = new int[5952];
         //private double[] Sum = new double[5952];
-        enum Activity { Shopping, Eating, Transportation, work, Social, home, study, Recreation, Entertainment };  // 隐藏状态（活动）
+        enum Activity { Shopping,Eating,Transportation, work, Social, home, study, Recreation, Entertainment };  // 隐藏状态（活动）
         int Totalcount = 0;
         int TotalUser = 0;
         //每个用户总活动数，唯一活动数。
@@ -67,7 +67,7 @@ namespace CMDPostProcess
         {
 
             //分163个文件读
-            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201604_CMProcess\\HMMResult\\versionTest5");
+            DirectoryInfo dir = new System.IO.DirectoryInfo("D:\\201604_CMProcess\\HMMResult\\versionTest2");
             int m = 0;
             foreach (FileInfo fi in dir.GetFiles())
             {
@@ -291,7 +291,7 @@ namespace CMDPostProcess
 
         public void WriteData()
         {
-            string directoryPath = @"D:\\201604_CMProcess\\HMMstatistical\\versionTest5";//定义一个路径变量            
+            string directoryPath = @"D:\\201604_CMProcess\\HMMstatistical\\versionTest2";//定义一个路径变量            
 
             if (!Directory.Exists(directoryPath))//如果路径不存在
             {
@@ -318,17 +318,43 @@ namespace CMDPostProcess
                 }
                 swTT.Write("\r\n");
             }
+
+            //MixEntropy
             //TowerCategory
             StreamWriter swTtC = new StreamWriter(Path.Combine(directoryPath, "TowerCategory.txt")); ;
             foreach (var TT in TowerCategory)
             {
                 swTtC.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", TT.Key, CellInfo[TT.Key][0], CellInfo[TT.Key][1], CellInfo[TT.Key][2], CellInfo[TT.Key][3]);
+                int sum = 0;
+                int sumOther = 0;
                 for (int j = 0; j < 9; j++)
                 {
                     swTtC.Write("{0}\t", TT.Value[j]);
+                    sum += TT.Value[j];
+                    if (j != 3 && j != 5)
+                        sumOther += TT.Value[j];
                 }
+                swTtC.Write("{0}\t", sum);
+                double Entropy = 0.0;
+                double EntropyWhole = 0.0;
+                for(int m=0;m<9;m++)
+                {
+                    if(m!=3&&m!=5)
+                    {
+                        double Fra = TT.Value[m] / (double)sumOther;
+                        if (Fra != 0)
+                            Entropy += Fra * Math.Log(Fra);
+                    }
+                    double Fra2 = TT.Value[m] / (double)sum;
+                    if (Fra2 != 0)
+                        EntropyWhole += Fra2 * Math.Log(Fra2);
+                }
+                swTtC.Write("{0}\t", -Entropy);
+                swTtC.Write("{0}\t", -EntropyWhole);
                 swTtC.Write("\r\n");
             }
+
+
             //RegionTime
             StreamWriter swRT = new StreamWriter(Path.Combine(directoryPath, "RegionTime.txt")); ;
             foreach (var TT in RegionTime)
