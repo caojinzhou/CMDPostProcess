@@ -10,12 +10,17 @@ namespace CMDPostProcess
     {
         static void Main(string[] args)
         {
-            ResultCluster process = new ResultCluster();
+            //ResultCluster process = new ResultCluster();
+            //process.CellIdInfoInput();
+            //process.ReadData();
+
+            ////process.FindMax();
+            //process.APStatistic();
+            //process.WriteData();
+
+            STPatternStract process = new STPatternStract();
             process.CellIdInfoInput();
             process.ReadData();
-            //process.MPDataProcessing();
-            //process.FindMax();
-            process.APStatistic();
             process.WriteData();
         }
     }
